@@ -11,15 +11,6 @@
 #include "header.h"
 // pthread.h included in header.h
 
-void *producer(void *args);
-void *consumer(void *args);
-int totals[26];
-pthread_mutex_t totals_lock;
-pthread_mutex_t llist_lock;
-pthread_mutex_t cond_lock;
-pthread_cond_t new_package;
-int eof = 0;
-
 int main(int argc, char *argv[]){
 
 	//expects between 3 and 5 arguments
@@ -141,7 +132,9 @@ void *consumer(void *args){
 		}
 		pthread_mutex_lock(&llist_lock);
 		//pull package from llist
-		char *package = "hello.this.is.a.a.a.test test test test\n";
+		
+		struct node* new_node = getHead();
+		char *package = new_node->line;
 		empty = 1;
 		pthread_mutex_unlock(&llist_lock);
 
@@ -161,15 +154,6 @@ void *consumer(void *args){
 	}
 	
 
-}
-
-void *producer(void *args){
-	sleep(1);
-	pthread_cond_signal(&new_package);
-	sleep(1);
-	printf("producer finished\n");
-	eof = 1;
-	pthread_cond_broadcast(&new_package);
 }
 
 
