@@ -32,7 +32,6 @@ void *producer(void * args) {
     char c[max_char*linesCount];
     int i = 0;
 
-    pthread_mutex_init(&llist_lock, NULL);
     pthread_mutex_lock(&llist_lock);
 
     while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
