@@ -29,14 +29,18 @@ void *producer(void * args) {
     }
 
     rewind(fptr);
-    char c[max_char*linesCount];
+    //char c[max_char*linesCount];
+    char c[max_char];
     int i = 0;
 
-
-    while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
+    //while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
+    while(fgets(c, max_char, fptr) != NULL) {
        struct node* n1;
+       printf("before lock");
        pthread_mutex_lock(&llist_lock);
-       n1 = addNode(c + (i * max_char));
+       //n1 = addNode(c + (i * max_char));
+       n1 = addNode(c);
+       printf("is empty: %d\n", isEmpty());
        pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
        i++;
@@ -45,5 +49,5 @@ void *producer(void * args) {
     eof = 1;
 
     pthread_cond_broadcast(&new_package);
-  //  printall();
+    //printall();
 }
