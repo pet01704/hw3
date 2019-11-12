@@ -8,7 +8,7 @@
 #include "header.h"
 // pthread.h included in header.h
 
-void producer(void * args) {
+void *producer(void * args) {
     FILE *fptr = (FILE*) args;
   //  FILE * fptr;
     int r;
@@ -20,6 +20,7 @@ void producer(void * args) {
     //     exit(1);
     // }
 
+    // Calulate the number of lines in file
     while((ch=fgetc(fptr))!=EOF) {
       if(ch=='\n') {
         linesCount++;
@@ -27,26 +28,20 @@ void producer(void * args) {
     }
 
     rewind(fptr);
-    char c[1024*linesCount];
+    char c[max_char*linesCount];
     int i = 0;
 
-    pthread_mutex_init(&m, NULL);
-    pthread_mutex_lock(&m);
+    pthread_mutex_init(&llist_lock, NULL);
+    pthread_mutex_lock(&llist_lock);
 
-    while(fgets(c+(i*1024), 1024*linesCount, fptr) != NULL) {
+    while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
        struct node* n1;
-       n1 = addNode(c + (i * 1024));
+       n1 = addNode(c + (i * max_char));
+       pthread_cond_signal(&new_package);
        i++;
     }
 
-    pthread_cond_signal(&cond);
-    pthread_mutex_unlock(&m);
-}
-
-
-int main()
-{
-  producer();
-
-  printall();
+    eof = 1;
+    pthread_cond_broadcast(&new_package);
+    pthread_mutex_unlock(&llist_lock);
 }

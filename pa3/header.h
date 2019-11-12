@@ -19,16 +19,25 @@ struct node{
   struct node* next;
 };
 
+void *producer(void * args);
+void *consumer(void * args);
+
 struct node* addNode(char* l);
 struct node* getHead();
+
 int isEmpty();
 void printall();
 
 struct node* head;
 struct node* tail;
-pthread_mutex_t m;
-pthread_cond_t cond;
 
-int eof;
+pthread_mutex_t totals_lock;
+pthread_mutex_t llist_lock;
+pthread_mutex_t cond_lock;
+pthread_cond_t new_package;
+
+int totals[26];
+int max_char = 1024;
+int eof = 0;
 
 #endif
