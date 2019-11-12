@@ -117,25 +117,31 @@ void count_words( char *str, int *totals){
 }
 
 void *consumer(void *args){
-	int empty = 1;
+	
 
-	while (! (eof && empty) ){
+
+	while (! (eof && isEmpty()) ){
 		//while linked list is empty
-		while (empty){
-			printf("here1\n");
+		printf("here outside 2\n");
+
+
+		while (isEmpty()){
+			
+
 			pthread_cond_wait(&new_package,&cond_lock);
-			printf("here\n");
-			empty = 0;
-			if (eof){			
+			printf("here outside\n");
+			if (eof){
+				printf("%d\n",isEmpty());
+				printf("here\n");			
 				return NULL;
 			}
 		}
+
 		pthread_mutex_lock(&llist_lock);
 		//pull package from llist
-		
 		struct node* new_node = getHead();
 		char *package = new_node->line;
-		empty = 1;
+		printf("Producer recieved package '%s'\n",package);
 		pthread_mutex_unlock(&llist_lock);
 
 		//do word count on the package
