@@ -28,7 +28,7 @@ struct node* addNode(char* l) {
 // Get the head and removes it from queue
 struct node* getHead() {
   if (head == NULL) {
-    exit(0);
+    return NULL;
   }
   struct node* h = head;
   head = head->next;
