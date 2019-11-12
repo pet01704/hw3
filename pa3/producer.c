@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "header.h"
 // pthread.h included in header.h
 
@@ -40,8 +41,10 @@ void *producer(void * args) {
        pthread_cond_signal(&new_package);
        i++;
     }
-
+    sleep(1);
     eof = 1;
+
     pthread_cond_broadcast(&new_package);
     pthread_mutex_unlock(&llist_lock);
+  //  printall();
 }
