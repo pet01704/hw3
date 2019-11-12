@@ -32,11 +32,12 @@ void *producer(void * args) {
     char c[max_char*linesCount];
     int i = 0;
 
-    pthread_mutex_lock(&llist_lock);
 
     while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
        struct node* n1;
+       pthread_mutex_lock(&llist_lock);
        n1 = addNode(c + (i * max_char));
+       pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
        i++;
     }
@@ -44,6 +45,5 @@ void *producer(void * args) {
     eof = 1;
 
     pthread_cond_broadcast(&new_package);
-    pthread_mutex_unlock(&llist_lock);
   //  printall();
 }
