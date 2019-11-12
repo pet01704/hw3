@@ -13,7 +13,9 @@
 // Add a node to the queue
 struct node* addNode(char* l) {
   struct node* n = malloc(sizeof(struct node));
-  n->line = l;
+  char* ln = malloc(sizeof(l));
+  strcpy(ln,l);
+  n->line = ln;
   n->next = NULL;
   // if queue is empty, set this as head and tail
   if (head==NULL) {
