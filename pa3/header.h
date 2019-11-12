@@ -13,6 +13,7 @@ it will:
 
 #ifndef _HEADER_H_
 #define _HEADER_H_
+#define max_char 1024
 
 struct node{
   char *line;
@@ -37,7 +38,6 @@ pthread_mutex_t cond_lock;
 pthread_cond_t new_package;
 
 int totals[26];
-int max_char = 1024;
-int eof = 0;
+int eof;
 
 #endif
