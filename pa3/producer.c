@@ -28,6 +28,7 @@ void *producer(void * args) {
 
     eof = 1;
     pthread_cond_signal(&new_package);
+    sleep(1);
     pthread_cond_signal(&new_package);
 
     //pthread_cond_broadcast(&new_package);
