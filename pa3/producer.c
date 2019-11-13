@@ -22,9 +22,10 @@ void *producer(void * args) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
        addNode(c);
-       pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
+       pthread_mutex_unlock(&llist_lock);
     }
+    
     sleep(1);
 
     eof = 1;
