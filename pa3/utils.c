@@ -21,15 +21,18 @@ struct node* addNode(char* l) {
   if (head==NULL) {
     head = n;
     tail = n;
+  } else {
+    tail->next = n;
+    tail = n;
   }
-  tail->next = n;
-  tail = n;
+
   return n;
 }
 
 // Get the head and removes it from queue
 struct node* getHead() {
   if (head == NULL) {
+    printf("head is null");
     return NULL;
   }
   struct node* h = head;
