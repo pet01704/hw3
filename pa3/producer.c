@@ -19,7 +19,7 @@ void *producer(void * args) {
        pthread_mutex_lock(&llist_lock);
        addNode(c);
     //   num_items++;
-       printf("update num_items %d\n", num_items);
+    //   printf("update num_items %d\n", num_items);
        pthread_cond_signal(&new_package);
        pthread_mutex_unlock(&llist_lock);
     }
