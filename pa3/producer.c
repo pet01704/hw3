@@ -14,11 +14,11 @@ void *producer(void * args) {
 
     char c[max_char];
 
-    while(fgets(c, max_char, fptr) != NULL && num_items < queue_size) {
+    while(fgets(c, max_char, fptr) != NULL) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
        addNode(c);
-       num_items++;
+    //   num_items++;
        printf("update num_items %d\n", num_items);
        pthread_cond_signal(&new_package);
        pthread_mutex_unlock(&llist_lock);
