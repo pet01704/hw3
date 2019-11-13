@@ -23,7 +23,6 @@ void addNode(char* l) {
     head = n;
     tail = head;
   } else {
-    printf("tail %s\n", tail->line);
     tail->next = n;
     tail = n;
   }

@@ -16,39 +16,15 @@ void *producer(void * args) {
     int linesCount;
     int ch = 0;
 
-    // if((fptr = fopen("test2.txt", "r+")) == NULL) {
-    //     printf("No such file\n");
-    //     exit(1);
-    // }
-
-    // Calulate the number of lines in file
-    // while((ch=fgetc(fptr))!=EOF) {
-    //   if(ch=='\n') {
-    //     linesCount++;
-    //   }
-    // }
-    //
-    // rewind(fptr);
-    //char c[max_char*linesCount];
     char c[max_char];
 
-  //  int i = 0;
-
-    //while(fgets(c+(i*max_char), max_char*linesCount, fptr) != NULL) {
     while(fgets(c, max_char, fptr) != NULL) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
-       //n1 = addNode(c + (i * max_char));
        addNode(c);
-    //   printf("line after addnode: %s\n", n1->line);
-    //   printf("is empty: %d\n", isEmpty());
        pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
-    //   i++;
     }
-
-    printall();
-
     sleep(1);
 
     eof = 1;
