@@ -37,7 +37,10 @@ pthread_mutex_t llist_lock;
 pthread_mutex_t cond_lock;
 pthread_cond_t new_package;
 
+int linesCount;
+int linesCompleted;
 int queue_size;
+int queue_size_set;
 int num_items;
 int totals[26];
 int eof;
