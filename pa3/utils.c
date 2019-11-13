@@ -11,31 +11,34 @@
 // implement shared queue, final histogram here..
 
 // Add a node to the queue
-struct node* addNode(char* l) {
+void addNode(char* l) {
   struct node* n = malloc(sizeof(struct node));
-  char* ln = malloc(sizeof(l));
+  char* ln = malloc(max_char);
   strcpy(ln,l);
+
   n->line = ln;
   n->next = NULL;
   // if queue is empty, set this as head and tail
   if (head==NULL) {
     head = n;
-    tail = n;
+    tail = head;
   } else {
+    printf("tail %s\n", tail->line);
     tail->next = n;
     tail = n;
   }
-
-  return n;
 }
 
 // Get the head and removes it from queue
 struct node* getHead() {
+  //printf("GETHEAD\n");
   if (head == NULL) {
     printf("head is null");
     return NULL;
   }
   struct node* h = head;
+//  printf("lines %s\n", head->line);
+
   head = head->next;
   // return the head
   return h;
@@ -61,26 +64,3 @@ void printall() {
     n = n->next;
   }
 }
-
-//
-// int main()
-// {
-//   struct node* n1;
-//   struct node* n2;
-//   struct node* n3;
-//   struct node* n4;
-//
-//
-//   n1 = addNode("hello");
-//   n2 = addNode("world");
-//   n3 = addNode("this");
-//   n4 = addNode("works");
-//   printall();
-//   printf("isEMpty: %d\n", isEmpty());
-//   printf("Head is: %s\n", getHead()->line);
-//   printf("Head is: %s\n", getHead()->line);
-//   printf("Head is: %s\n", getHead()->line);
-//   printf("Head is: %s\n", getHead()->line);
-//   printf("Head is: %s\n", getHead()->line);
-//
-// }
