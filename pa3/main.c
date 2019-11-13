@@ -10,6 +10,11 @@
 #include <unistd.h>
 #include "header.h"
 // pthread.h included in header.h
+struct timeval tv;
+struct timespec ts;
+ int rt;
+
+    
 
 int main(int argc, char *argv[]){
 
@@ -39,7 +44,6 @@ int main(int argc, char *argv[]){
 	//argv[3] and argv[4] can be option or queue size for ec
 	int option_set = 0;
 	int queue_size_set = 0;
-	int queue_size = 0;
 	for (int i = 3; i < argc; i ++){
 		if (!strcmp(argv[i],"-p") && !option_set){
 			option_set = 1;
@@ -60,8 +64,10 @@ int main(int argc, char *argv[]){
 	pthread_t producer_t;
 	pthread_t consumer_t[n_consumers];
 
-	//create producer thread
-	pthread_create(&producer_t, NULL, producer, fptr); 
+	
+	//initialize counter
+	linesCompleted = 0;
+	
 
 	//initialize histogram
 	for(int i =0;i<26;i++){
@@ -70,11 +76,16 @@ int main(int argc, char *argv[]){
 	//initialize mutex lock for totals
 	pthread_mutex_init(&totals_lock, NULL);
 	pthread_mutex_init(&llist_lock, NULL);
-	pthread_mutex_init(&cond_lock, NULL);
+	//pthread_mutex_init(&cond_lock, NULL);
+	pthread_cond_init(&new_package, NULL);
+
+	//create producer thread
+	pthread_create(&producer_t, NULL, producer, fptr); 
+
 
 	//create n_consumer consumer threads
 	for (int i = 0; i < n_consumers; i++){
-		pthread_create(&consumer_t[i], NULL, consumer, NULL); 
+		pthread_create(&consumer_t[i], NULL, consumer, i); 
 	}
 	
 	//wait for all threads to join back
@@ -118,32 +129,49 @@ void count_words( char *str, int *totals){
 
 void *consumer(void *args){
 	
-
-
-	while (! (eof && isEmpty()) ){
-		//while linked list is empty
-		printf("here outside 2\n");
-
-
-		while (isEmpty()){
+	//args is an int pointer
+	int id = (int) args;
+	printf("id: %d\n",id);
+	while (! (eof && isEmpty())){
+		pthread_mutex_lock(&llist_lock);
+		
+		while (isEmpty() && !eof){
+			printf("cond %d\n",id);
 			
-
-			pthread_cond_wait(&new_package,&cond_lock);
-			printf("here outside\n");
-			if (eof){
-				printf("%d\n",isEmpty());
-				printf("here\n");			
+			gettimeofday(&tv, NULL);
+		    	ts.tv_sec = time(NULL) + (1000) / 1000;
+		    	ts.tv_nsec = tv.tv_usec * 1000 + 1000 * 1000 * ((1000) % 1000);
+		    	ts.tv_sec += ts.tv_nsec / (1000 * 1000 * 1000);
+		    	ts.tv_nsec %= (1000 * 1000 * 1000);
+			rt = pthread_cond_timedwait(&new_package,&llist_lock,&ts);//
+			//sleep(1);
+			printf("met %d\n",id);
+			if (eof || rt){
+				//pthread_cond_signal(&new_package);
+				printf("%d\n",isEmpty());			
 				return NULL;
 			}
 		}
+		
 
-		pthread_mutex_lock(&llist_lock);
-		//pull package from llist
-		struct node* new_node = getHead();
-		char *package = new_node->line;
-		printf("Producer recieved package '%s'\n",package);
+		printf("waiting %d\n",id);
+		//pthread_mutex_lock(&llist_lock);
+		printf("locked %d\n",id);
+		char* package;
+		if (!isEmpty()){
+			//pull package from llist
+			struct node* new_node = getHead();
+			package = new_node->line;
+			printf("Producer recieved package %s",package);
+			
+		}
+		printf("unlocking %d\n",id);
+
 		pthread_mutex_unlock(&llist_lock);
+		
 
+		printf("unlocked %d\n",id);
+		
 		//do word count on the package
 		int temp[26];
 		for (int i =0; i < 26; i++){
@@ -157,6 +185,9 @@ void *consumer(void *args){
 			totals[i] += temp[i];
 		}
 		pthread_mutex_unlock(&totals_lock);
+
+		
+		
 	}
 	
 
