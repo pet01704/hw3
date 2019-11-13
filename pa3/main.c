@@ -138,12 +138,12 @@ void count_words( char *str, int *totals){
 
 void *consumer(void *args){
 
+	//args is an int pointer
+	int id = (int) args;
+
 	if (logFlag){
 		fprintf(logFile,"consumer %d\n",id);
 	}
-
-	//args is an int pointer
-	int id = (int) args;
 
 	while (! (eof && isEmpty())){
 		pthread_mutex_lock(&llist_lock);
