@@ -13,7 +13,7 @@ it will:
 
 #ifndef _HEADER_H_
 #define _HEADER_H_
-#define max_char 1024
+#define max_char 1524
 
 struct node{
   char *line;

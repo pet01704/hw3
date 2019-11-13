@@ -50,11 +50,15 @@ int isEmpty() {
 
 void printall() {
   struct node* n = head;
+  if (head = tail) {
+    head->next = NULL;
+  }
   while(n != NULL) {
-    printf("%s", n->line);
+    printf("%s\n", n->line);
     n = n->next;
   }
 }
+
 //
 // int main()
 // {
