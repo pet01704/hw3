@@ -150,7 +150,6 @@ void *consumer(void *args){
 		while (isEmpty() && !eof){
 			pthread_cond_wait(&new_package,&llist_lock);
 			if (eof) {
-				printf("id: %d %d\n",id, isEmpty());
 				pthread_mutex_unlock(&llist_lock);
 				return NULL;
 			}
