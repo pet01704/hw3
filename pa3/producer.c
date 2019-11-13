@@ -39,15 +39,15 @@ void *producer(void * args) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
        //n1 = addNode(c + (i * max_char));
-       n1 = addNode(c);
-       printf("line: %s\n", n1->line);
+       addNode(c);
+    //   printf("line after addnode: %s\n", n1->line);
     //   printf("is empty: %d\n", isEmpty());
        pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
     //   i++;
     }
 
-  //  printall();
+    printall();
 
     sleep(1);
 
