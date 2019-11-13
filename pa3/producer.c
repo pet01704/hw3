@@ -11,25 +11,25 @@
 
 void *producer(void * args) {
     FILE *fptr = (FILE*) args;
-  //  FILE * fptr;
-    int r;
-    int linesCount;
-    int ch = 0;
 
     char c[max_char];
 
-    while(fgets(c, max_char, fptr) != NULL) {
+    while(fgets(c, max_char, fptr) != NULL && num_items < queue_size) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
        addNode(c);
+       num_items++;
+       printf("update num_items %d\n", num_items);
        pthread_cond_signal(&new_package);
        pthread_mutex_unlock(&llist_lock);
     }
-    
+
     sleep(1);
 
     eof = 1;
+    pthread_cond_signal(&new_package);
+    pthread_cond_signal(&new_package);
 
-    pthread_cond_broadcast(&new_package);
+    //pthread_cond_broadcast(&new_package);
 
 }
