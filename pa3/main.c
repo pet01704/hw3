@@ -8,12 +8,9 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include "header.h"
 // pthread.h included in header.h
-struct timeval tv;
-struct timespec ts;
- int rt;
-
     
 
 int main(int argc, char *argv[]){
@@ -138,11 +135,10 @@ void *consumer(void *args){
 		while (isEmpty() && !eof){
 			printf("cond %d\n",id);
 			
-			gettimeofday(&tv, NULL);
-		    	ts.tv_sec = time(NULL) + (1000) / 1000;
-		    	ts.tv_nsec = tv.tv_usec * 1000 + 1000 * 1000 * ((1000) % 1000);
-		    	ts.tv_sec += ts.tv_nsec / (1000 * 1000 * 1000);
-		    	ts.tv_nsec %= (1000 * 1000 * 1000);
+			int rt;
+			struct timespec ts = {0, 0};
+			clock_gettime(CLOCK_REALTIME, &ts);
+			ts.tv_sec += 1;
 			rt = pthread_cond_timedwait(&new_package,&llist_lock,&ts);//
 			//sleep(1);
 			printf("met %d\n",id);
