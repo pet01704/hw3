@@ -27,10 +27,11 @@ void *producer(void * args) {
     sleep(1);
 
     eof = 1;
+    pthread_mutex_lock(&cond_lock);
     pthread_cond_signal(&new_package);
     sleep(1);
     pthread_cond_signal(&new_package);
-
+    pthread_mutex_unlock(&cond_lock);
     //pthread_cond_broadcast(&new_package);
 
 }
