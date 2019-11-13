@@ -8,10 +8,10 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <sys/time.h>
 #include "header.h"
 // pthread.h included in header.h
-    
+
+
 
 int main(int argc, char *argv[]){
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
 	if ((fptr = fopen(argv[2], "r")) == NULL){
 		printf("Unable to open the file '%s'.\n",argv[2]);
 		printf("Usage: $ %s #consumer filename [option] [#queue_size]\n",argv[0]);
-		exit(1);       
+		exit(1);
 	}
 
 	//argv[3] and argv[4] can be option or queue size for ec
@@ -53,18 +53,18 @@ int main(int argc, char *argv[]){
 		}else{
 			printf("Invalid argument '%s'.\n",argv[i]);
 			printf("Usage: $ %s #consumer filename [option] [#queue_size]\n",argv[0]);
-			exit(1);   
+			exit(1);
 		}
 	}
-	
-	
+
+
 	pthread_t producer_t;
 	pthread_t consumer_t[n_consumers];
 
-	
+
 	//initialize counter
 	linesCompleted = 0;
-	
+
 
 	//initialize histogram
 	for(int i =0;i<26;i++){
@@ -77,23 +77,23 @@ int main(int argc, char *argv[]){
 	pthread_cond_init(&new_package, NULL);
 
 	//create producer thread
-	pthread_create(&producer_t, NULL, producer, fptr); 
+	pthread_create(&producer_t, NULL, producer, fptr);
 
 
 	//create n_consumer consumer threads
 	for (int i = 0; i < n_consumers; i++){
-		pthread_create(&consumer_t[i], NULL, consumer, i); 
+		pthread_create(&consumer_t[i], NULL, consumer, i);
 	}
-	
+
 	//wait for all threads to join back
-	pthread_join(producer_t, NULL); 
+	pthread_join(producer_t, NULL);
 	for (int i = 0; i < n_consumers; i++){
-		pthread_join(consumer_t[i], NULL); 
+		pthread_join(consumer_t[i], NULL);
 	}
 
 	//close fptr
 	fclose(fptr);
-	
+
 	//format histogram from int array and write to file
 	FILE *out;
 	out = fopen("result.txt","w+");
@@ -125,49 +125,46 @@ void count_words( char *str, int *totals){
 }
 
 void *consumer(void *args){
-	
+
 	//args is an int pointer
 	int id = (int) args;
 	printf("id: %d\n",id);
+
 	while (! (eof && isEmpty())){
+		printf("waiting for lock %d\n",id);
 		pthread_mutex_lock(&llist_lock);
-		
+		printf("locked %d\n",id);
 		while (isEmpty() && !eof){
-			printf("cond %d\n",id);
-			
-			int rt;
-			struct timespec ts = {0, 0};
-			clock_gettime(CLOCK_REALTIME, &ts);
-			ts.tv_sec += 1;
-			rt = pthread_cond_timedwait(&new_package,&llist_lock,&ts);//
+			printf("waiting  for package %d\n",id);
+			pthread_cond_wait(&new_package,&llist_lock);//
+		//	pthread_cond_broadcast(&new_package);
 			//sleep(1);
 			printf("met %d\n",id);
-			if (eof || rt){
-				//pthread_cond_signal(&new_package);
-				printf("%d\n",isEmpty());			
+			if (eof) {
+				printf("id: %d %d\n",id, isEmpty());
+				pthread_mutex_unlock(&llist_lock);
 				return NULL;
 			}
 		}
-		
 
-		printf("waiting %d\n",id);
-		//pthread_mutex_lock(&llist_lock);
-		printf("locked %d\n",id);
-		char* package;
+		char* package ="";
 		if (!isEmpty()){
 			//pull package from llist
+
 			struct node* new_node = getHead();
-			package = new_node->line;
-			printf("Producer recieved package %s",package);
-			
+			if (new_node != NULL){
+				package = new_node->line;
+				printf("Producer recieved package %s\n",package);
+			}
+
 		}
 		printf("unlocking %d\n",id);
 
 		pthread_mutex_unlock(&llist_lock);
-		
+
 
 		printf("unlocked %d\n",id);
-		
+
 		//do word count on the package
 		int temp[26];
 		for (int i =0; i < 26; i++){
@@ -182,41 +179,9 @@ void *consumer(void *args){
 		}
 		pthread_mutex_unlock(&totals_lock);
 
-		
-		
+
+
 	}
-	
+
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
