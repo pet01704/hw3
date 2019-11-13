@@ -41,13 +41,16 @@ int main(int argc, char *argv[]){
 	//argv[3] and argv[4] can be option or queue size for ec
 	int option_set = 0;
 	int queue_size_set = 0;
+	logFlag = 0;
 	for (int i = 3; i < argc; i ++){
 		if (!strcmp(argv[i],"-p") && !option_set){
 			option_set = 1;
+			logFlag = 1;
 		}else if (!strcmp(argv[i],"-b") && !option_set){
 			option_set = 1;
 		}else if (!strcmp(argv[i],"-bp") && !option_set){
 			option_set = 1;
+			logFlag = 1;
 		}else if(!queue_size_set && (queue_size = atoi(argv[i]) > 0)){
 			queue_size_set = 1;
 		}else{
@@ -56,14 +59,17 @@ int main(int argc, char *argv[]){
 			exit(1);
 		}
 	}
-
+	
+	
+	if (logFlag){
+		if ((logFile = fopen("log.txt", "w+")) == NULL){
+			printf("Unable to open log.txt.\n");
+			exit(0);
+		}
+	}
 
 	pthread_t producer_t;
 	pthread_t consumer_t[n_consumers];
-
-
-	//initialize counter
-	linesCompleted = 0;
 
 
 	//initialize histogram
@@ -93,6 +99,12 @@ int main(int argc, char *argv[]){
 
 	//close fptr
 	fclose(fptr);
+	if (logFlag){	
+		fclose(logFile);
+	}
+	
+
+	//create_result();
 
 	//format histogram from int array and write to file
 	FILE *out;
@@ -126,44 +138,35 @@ void count_words( char *str, int *totals){
 
 void *consumer(void *args){
 
+	if (logFlag){
+		fprintf(logFile,"consumer %d\n",id);
+	}
+
 	//args is an int pointer
 	int id = (int) args;
-	printf("id: %d\n",id);
 
 	while (! (eof && isEmpty())){
-		printf("waiting for lock %d\n",id);
 		pthread_mutex_lock(&llist_lock);
-		printf("locked %d\n",id);
 		while (isEmpty() && !eof){
-			printf("waiting  for package %d\n",id);
-			pthread_cond_wait(&new_package,&llist_lock);//
-		//	pthread_cond_broadcast(&new_package);
-			//sleep(1);
-			printf("met %d\n",id);
+			pthread_cond_wait(&new_package,&llist_lock);
 			if (eof) {
 				printf("id: %d %d\n",id, isEmpty());
 				pthread_mutex_unlock(&llist_lock);
 				return NULL;
 			}
 		}
-
 		char* package ="";
 		if (!isEmpty()){
-			//pull package from llist
-
 			struct node* new_node = getHead();
 			if (new_node != NULL){
 				package = new_node->line;
-				printf("Producer recieved package %s\n",package);
+				if (logFlag){
+					fprintf(logFile,"consumer %d: %d\n",id,new_node->lineNumber);
+				}
 			}
 
 		}
-		printf("unlocking %d\n",id);
-
 		pthread_mutex_unlock(&llist_lock);
-
-
-		printf("unlocked %d\n",id);
 
 		//do word count on the package
 		int temp[26];
