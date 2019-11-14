@@ -157,6 +157,8 @@ void *consumer(void *args){
 		char* package ="";
 		if (!isEmpty()){
 			struct node* new_node = getHead();
+			pthread_cond_signal(&package_consumed);
+			packages--;
 			if (new_node != NULL){
 				package = new_node->line;
 				if (logFlag){
