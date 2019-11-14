@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "header.h"
 // pthread.h included in header.h
 
@@ -26,10 +27,8 @@ void count_words( char *str, int *totals){
 }
 
 void *consumer(void *args){
-
 	//args is an int pointer
-	int id = (int) args;
-
+  int id = *((int*) args);
 	if (logFlag){
 		fprintf(logFile,"consumer %d\n",id);
 	}
@@ -47,7 +46,7 @@ void *consumer(void *args){
 		if (!isEmpty()){
 			struct node* new_node = getHead();
 			packages--;
-			pthread_cond_signal(&package_consumed);			
+			pthread_cond_signal(&package_consumed);
 			if (new_node != NULL){
 				package = new_node->line;
 				if (logFlag){

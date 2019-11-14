@@ -11,8 +11,6 @@
 #include "header.h"
 // pthread.h included in header.h
 
-
-
 int main(int argc, char *argv[]){
 
 	//expects between 3 and 5 arguments
@@ -63,9 +61,9 @@ int main(int argc, char *argv[]){
 			printf("Usage: $ %s #consumer filename [option] [#queue_size]\n",argv[0]);
 			exit(1);
 		}
-	}	
-	
-	
+	}
+
+
 	if (logFlag){
 		if ((logFile = fopen("log.txt", "w+")) == NULL){
 			printf("Unable to open log.txt.\n");
@@ -93,7 +91,8 @@ int main(int argc, char *argv[]){
 
 	//create n_consumer consumer threads
 	for (int i = 0; i < n_consumers; i++){
-		pthread_create(&consumer_t[i], NULL, consumer, i);
+		int id = i;
+		pthread_create(&consumer_t[i], NULL, consumer, &id);
 	}
 
 	//wait for all threads to join back
@@ -104,93 +103,11 @@ int main(int argc, char *argv[]){
 
 	//close fptr
 	fclose(fptr);
-	if (logFlag){	
+	if (logFlag){
 		fclose(logFile);
 	}
-	
 
-	//create_result();
-
-	//format histogram from int array and write to file
-	FILE *out;
-	out = fopen("result.txt","w+");
-	for(int i =0;i<26;i++){
-		fprintf(out,"%c: %d\n",i+97,totals[i]);
-	}
-	fclose(out);
-
-
+	createResult();
 
 	return 0;
-}
-
-void count_words( char *str, int *totals){
-	int reset = 1;
-	int i = 0;
-	while (str[i] != '\0') {
-		char cur = tolower(str[i]);
-   		if (cur >= 'a' && cur <= 'z') {
-			if (reset){
-				totals[cur - 'a']++;
-				reset = 0;
-			}
-		}else{
-			reset = 1;
-		}
-    		i++;
-	}
-}
-
-void *consumer(void *args){
-
-	//args is an int pointer
-	int id = (int) args;
-
-	if (logFlag){
-		fprintf(logFile,"consumer %d\n",id);
-	}
-
-	while (! (eof && isEmpty())){
-		pthread_mutex_lock(&llist_lock);
-		while (isEmpty() && !eof){
-			pthread_cond_wait(&new_package,&llist_lock);
-			if (eof) {
-				pthread_mutex_unlock(&llist_lock);
-				return NULL;
-			}
-		}
-		char* package ="";
-		if (!isEmpty()){
-			struct node* new_node = getHead();
-			packages--;
-			pthread_cond_signal(&package_consumed);			
-			if (new_node != NULL){
-				package = new_node->line;
-				if (logFlag){
-					fprintf(logFile,"consumer %d: %d\n",id,new_node->lineNumber);
-				}
-			}
-
-		}
-		pthread_mutex_unlock(&llist_lock);
-
-		//do word count on the package
-		int temp[26];
-		for (int i =0; i < 26; i++){
-			temp[i] = 0;
-		}
-		count_words(package, temp);
-
-		//add results to histogram
-		pthread_mutex_lock(&totals_lock);
-		for (int i =0; i < 26; i++){
-			totals[i] += temp[i];
-		}
-		pthread_mutex_unlock(&totals_lock);
-
-
-
-	}
-
-
 }

@@ -31,15 +31,11 @@ void addNode(char* l, int i) {
 
 // Get the head and removes it from queue
 struct node* getHead() {
-  //printf("GETHEAD\n");
   if (head == NULL) {
-    printf("head is null");
     return NULL;
   }
   struct node* h = head;
-//  printf("lines %s\n", head->line);
   head = head->next;
-  // return the head
   return h;
 }
 
@@ -51,6 +47,16 @@ int isEmpty() {
   } else {
     return 0;
   }
+}
+
+void createResult() {
+  //format histogram from int array and write to file
+	FILE *out;
+	out = fopen("result.txt","w+");
+	for(int i =0;i<26;i++){
+		fprintf(out,"%c: %d\n",i+97,totals[i]);
+	}
+	fclose(out);
 }
 
 // Prints all nodes in queue
