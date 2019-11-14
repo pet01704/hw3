@@ -1,5 +1,5 @@
 /*test machine: CSELAB_machine_name * date: mm/dd/yy
-* name: full_name1 , [full_name2]
+* name: Tseki Lhamo , Daniel Peterson
 * x500: id_for_first_name , [id_for_second_name] */
 
 /*
@@ -17,28 +17,30 @@ it will:
 
 struct node{
   char *line;
+  int lineNumber;
   struct node* next;
 };
+
+int logFlag;
+FILE* logFile;
 
 void *producer(void * args);
 void *consumer(void * args);
 
-void addNode(char* l);
+struct node* head;
+struct node* tail;
+void addNode(char* l, int i);
 struct node* getHead();
-
 int isEmpty();
 void printall();
 
-struct node* head;
-struct node* tail;
+extern pthread_mutex_t totals_lock;
+extern pthread_mutex_t llist_lock;
+extern pthread_mutex_t cond_lock;
+extern pthread_cond_t new_package;
+extern pthread_cond_t package_consumed;
 
-pthread_mutex_t totals_lock;
-pthread_mutex_t llist_lock;
-pthread_mutex_t cond_lock;
-pthread_cond_t new_package;
-
-int linesCount;
-int linesCompleted;
+int packages;
 int queue_size;
 int queue_size_set;
 int num_items;

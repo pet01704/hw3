@@ -11,12 +11,13 @@
 // implement shared queue, final histogram here..
 
 // Add a node to the queue
-void addNode(char* l) {
+void addNode(char* l, int i) {
   struct node* n = malloc(sizeof(struct node));
   char* ln = malloc(max_char);
   strcpy(ln,l);
 
   n->line = ln;
+  n->lineNumber = i;
   n->next = NULL;
   // if queue is empty, set this as head and tail
   if (head==NULL) {
@@ -37,7 +38,6 @@ struct node* getHead() {
   }
   struct node* h = head;
 //  printf("lines %s\n", head->line);
-
   head = head->next;
   // return the head
   return h;
@@ -53,6 +53,7 @@ int isEmpty() {
   }
 }
 
+// Prints all nodes in queue
 void printall() {
   struct node* n = head;
   if (head = tail) {

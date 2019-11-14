@@ -7,42 +7,48 @@
 #include <string.h>
 #include <unistd.h>
 #include "header.h"
-// pthread.h included in header.h
+
+pthread_mutex_t totals_lock;
+pthread_mutex_t llist_lock;
+pthread_mutex_t cond_lock;
+pthread_cond_t new_package;
+pthread_cond_t package_consumed;
 
 void *producer(void * args) {
     FILE *fptr = (FILE*) args;
-  //  FILE * fptr;
-    int r;
-    int ch = 0;
 
-    // Calulate the number of lines in file
-    while((ch=fgetc(fptr))!=EOF) {
-      if(ch=='\n') {
-        linesCount++;
-      }
+    if(logFlag) {
+      fprintf(logFile, "producer\n");
     }
 
-    rewind(fptr);
     char c[max_char];
+    int currentLine;
 
+    // Read file line by line
     while(fgets(c, max_char, fptr) != NULL) {
        struct node* n1;
        pthread_mutex_lock(&llist_lock);
-       addNode(c);
+       addNode(c, currentLine);
+       if(logFlag) {
+         fprintf(logFile, "producer %d\n", currentLine);
+       }
+       currentLine++;
+       packages++;
+       printf("queue_size %d queue_size_set %d packages %d\n", queue_size, queue_size_set, packages);
+       if(queue_size_set && packages >= queue_size){
+         printf("waiting\n");
+         pthread_cond_wait(&package_consumed,&llist_lock);
+       }
        pthread_mutex_unlock(&llist_lock);
        pthread_cond_signal(&new_package);
     }
-
-    printall();
-
-    sleep(1);
-
+    // Set end of file flag
     eof = 1;
+    if(logFlag) {
+      fprintf(logFile, "producer %d\n", -1);
+    }
     pthread_mutex_lock(&llist_lock);
-    pthread_cond_signal(&new_package);
-    sleep(1);
-    pthread_cond_signal(&new_package);
+    pthread_cond_broadcast(&new_package);
     pthread_mutex_unlock(&llist_lock);
-  //  pthread_cond_broadcast(&new_package);
 
 }
