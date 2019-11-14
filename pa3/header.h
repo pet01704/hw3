@@ -1,6 +1,6 @@
-/*test machine: CSELAB_machine_name * date: mm/dd/yy
+/*test machine: CSELAB_machine_name * date: 11/13/19
 * name: Tseki Lhamo , Daniel Peterson
-* x500: id_for_first_name , [id_for_second_name] */
+* x500: lhamo012 , pet01704 */
 
 /*
 header.h, header for all source files
@@ -32,6 +32,7 @@ struct node* tail;
 void addNode(char* l, int i);
 struct node* getHead();
 int isEmpty();
+void createResult();
 void printall();
 
 extern pthread_mutex_t totals_lock;

@@ -1,6 +1,6 @@
-/*test machine: CSELAB_machine_name * date: mm/dd/yy
-* name: full_name1 , [full_name2]
-* x500: id_for_first_name , [id_for_second_name] */
+/*test machine: CSELAB_machine_name * date: 11/13/19
+* name: Tseki Lhamo , Daniel Peterson
+* x500: lhamo012 , pet01704 */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,9 +34,7 @@ void *producer(void * args) {
        }
        currentLine++;
        packages++;
-       printf("queue_size %d queue_size_set %d packages %d\n", queue_size, queue_size_set, packages);
        if(queue_size_set && packages >= queue_size){
-         printf("waiting\n");
          pthread_cond_wait(&package_consumed,&llist_lock);
        }
        pthread_mutex_unlock(&llist_lock);
