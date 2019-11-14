@@ -38,27 +38,32 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	//argv[3] and argv[4] can be option or queue size for ec
-	int option_set = 0;
-	queue_size_set = 0;
-	logFlag = 0;
-	for (int i = 3; i < argc; i ++){
-		if (!strcmp(argv[i],"-p") && !option_set){
-			option_set = 1;
+	//argv[3] is the option
+	if (argc > 3){
+		if (!strcmp(argv[3],"-p")){
 			logFlag = 1;
-		}else if (!strcmp(argv[i],"-b") && !option_set){
-			option_set = 1;
-		}else if (!strcmp(argv[i],"-bp") && !option_set){
-			option_set = 1;
-			logFlag = 1;
-		}else if(!queue_size_set && (queue_size = atoi(argv[i]) > 0)){
+		}else if (!strcmp(argv[3],"-b")){
 			queue_size_set = 1;
+		}else if (!strcmp(argv[3],"-bp")){
+			queue_size_set = 1;
+			logFlag = 1;
 		}else{
-			printf("Invalid argument '%s'.\n",argv[i]);
+			printf("Invalid argument '%s'.\n",argv[3]);
 			printf("Usage: $ %s #consumer filename [option] [#queue_size]\n",argv[0]);
 			exit(1);
 		}
 	}
+
+	//argv[4] is the queue size
+	if (argc > 4){
+		if(queue_size_set){
+			sscanf(argv[4], "%d", &queue_size);
+		}else{
+			printf("Invalid argument '%s'.\n",argv[4]);
+			printf("Usage: $ %s #consumer filename [option] [#queue_size]\n",argv[0]);
+			exit(1);
+		}
+	}	
 	
 	
 	if (logFlag){
