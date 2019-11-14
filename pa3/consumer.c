@@ -8,6 +8,22 @@
 #include "header.h"
 // pthread.h included in header.h
 
+void count_words( char *str, int *totals){
+	int reset = 1;
+	int i = 0;
+	while (str[i] != '\0') {
+		char cur = tolower(str[i]);
+   		if (cur >= 'a' && cur <= 'z') {
+			if (reset){
+				totals[cur - 'a']++;
+				reset = 0;
+			}
+		}else{
+			reset = 1;
+		}
+    		i++;
+	}
+}
 
 void *consumer(void *args){
 
