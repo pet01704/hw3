@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 
 	//argv[3] and argv[4] can be option or queue size for ec
 	int option_set = 0;
-	int queue_size_set = 0;
+	queue_size_set = 0;
 	logFlag = 0;
 	for (int i = 3; i < argc; i ++){
 		if (!strcmp(argv[i],"-p") && !option_set){
